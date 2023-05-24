@@ -22,7 +22,7 @@ export const ComparePage = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:8000/compare/${country1}/${country2}`
+        `http://backend:8000/compare/${country1}/${country2}`
       );
       setComparisonData(response.data);
     } catch (error) {

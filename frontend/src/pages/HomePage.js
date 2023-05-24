@@ -13,7 +13,7 @@ export const HomePage = () => {
 
   const fetchTopCountries = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/top-5-countries");
+      const response = await axios.get("http://backend:8000/top-5-countries");
       setTopCountries(response.data);
     } catch (error) {
       console.error(error);

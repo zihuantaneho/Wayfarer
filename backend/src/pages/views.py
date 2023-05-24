@@ -64,16 +64,16 @@ def signin(request):
 @require_GET
 def compare_countries(request, country1, country2):
     # Формируем URL для запроса данных первой страны
-    url1 = f"http://localhost:3000/{country1}"
+    url1 = f"http://api:3000/{country1}"
     # Формируем URL для запроса данных второй страны
-    url2 = f"http://localhost:3000/{country2}"
+    url2 = f"http://api:3000/{country2}"
 
     try:
         # Выполняем GET-запросы для получения данных
         response1 = requests.get(url1)
         response2 = requests.get(url2)
 
-        
+
         #Сортируем, чтобы не было дублей, типа США-Канада и Канада-США
         sorted_countries = sorted([country1, country2])
 
@@ -90,10 +90,10 @@ def compare_countries(request, country1, country2):
             # Получаем JSON данные второй страны
             data2 = response2.json()
 
-            if len(data1['costs']) == 0: 
+            if len(data1['costs']) == 0:
                 return JsonResponse({"error": "We do not have sufficient amount of data for " + country1}, status=500)
 
-            if len(data2['costs']) == 0: 
+            if len(data2['costs']) == 0:
                 return JsonResponse({"error": "We do not have sufficient amount of data for " + country2}, status=500)
 
             # Вычисляем разницу между данными

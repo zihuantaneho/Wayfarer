@@ -1,0 +1,19 @@
+services:
+  frontend:
+    container_name: frontend
+    build: frontend
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+  backend:
+    container_name: backend
+    build: backend
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+  api:
+    container_name: api
+    build: api
+    restart: unless-stopped
+    ports:
+      - 3000:3000
