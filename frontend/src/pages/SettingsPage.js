@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { logOut } from "../api";
+import { logOut, getCheckoutUrl, getCallsRemaining } from "../api";
 
 const htmlElement = document.documentElement;
 
@@ -8,6 +8,22 @@ export const SettingsPage = () => {
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("darkMode") === "true" 
   );
+  const [callsRemaining, setCallsRemaining] = useState(0);
+  const [apiCallsToPurchase, setApiCallsToPurchase] = useState(0);
+
+  const fetchCallsRemaining = () => {
+    getCallsRemaining()
+      .then((calls) => {
+        setCallsRemaining(calls);
+      })
+      .catch((error) => {
+        console.error("Error fetching calls remaining:", error);
+      });
+  };
+
+  useEffect(() => {
+    fetchCallsRemaining();
+  }, []);
 
   const toggleDarkMode = () => {
     setDarkMode(!htmlElement.classList.contains("dark"));
@@ -28,7 +44,16 @@ export const SettingsPage = () => {
   const onLogOut = () => {
     logOut();
     navigate("/home");
-    // Implement logout functionality here
+  };
+
+  const handleApiCallsChange = (event) => {
+    setApiCallsToPurchase(Number(event.target.value));
+  };
+
+  const redirectToCheckout = async () => {
+    if (apiCallsToPurchase > 0) {
+      await getCheckoutUrl(apiCallsToPurchase);
+    }
   };
 
   return (
@@ -57,6 +82,28 @@ export const SettingsPage = () => {
             />
             <span className="slider round"></span>
           </label>
+        </div>
+        <div className="flex items-center mb-4">
+          <span className="mr-2 dark:text-white">API Calls Remaining:</span>
+          <span>{callsRemaining}</span>
+        </div>
+        <div className="flex items-center mb-4">
+          <span className="mr-2 dark:text-white">API Calls to Purchase:</span>
+          <input
+            type="number"
+            value={apiCallsToPurchase}
+            onChange={handleApiCallsChange}
+            min="0"
+          />
+        </div>
+        <div className="mb-12">
+          <button
+            onClick={redirectToCheckout}
+            className="bg-transparent hover:bg-blue-500 text-blue-500 hover:text-white border border-blue-500 hover:border-transparent font-semibold py-2 px-4 rounded w-full dark:text-blue-500 dark:hover:bg-blue-800 dark:border-blue-500 dark:hover:text-white"
+            disabled={apiCallsToPurchase <= 0}
+          >
+            Purchase and Checkout
+          </button>
         </div>
         <div>
           <button

@@ -1,16 +1,35 @@
+#!/usr/bin/python3
+# encoding: utf-8
 import requests
 from decimal import Decimal
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.db import models
-from .models import CountryQuery
+from pages.models import CountryQuery, UserProfile
+from django.shortcuts import redirect
 
-
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
+import os
 import json
+import stripe
+import logging
+
+#TODO: env
+#stripe.api_key = "sk_test_51HFGmbL6ej6rkcOPZAgfDDeKg4At624zhc0PWSaZoUlDFk7lEGDqmWdI8oekiq4AmX78HzkEYS3GH9DmdmB6NV4e00dRev9Thx"
+#endpoint_secret = "whsec_812d5fcb03d92761efe432f9300385ead5ffc68c1afb4e60e22047f46f354395" 
+
+stripe.api_key = os.environ["STRIPE_API_KEY"]
+endpoint_secret = os.environ["STRIPE_WEBHOOK_SECRET"]
+
+#"whsec_R4hsnsQ3Dfwnu5H6sLYjMw5QBLcLU5hc"
+
+logging.basicConfig()
+logger = logging.getLogger('backend_views')
+logger.setLevel(logging.DEBUG)
 
 
 @require_GET
@@ -26,6 +45,8 @@ def top_queried_countries(request):
 @csrf_exempt
 @require_POST
 def signup(request):
+    logger.info(f"Request: {request}")
+
     body = json.loads(request.body.decode())
     username = body["username"]
     password = body["password"]
@@ -38,6 +59,7 @@ def signup(request):
 
     user = User.objects.create_user(username=username, password=password)
     token = Token.objects.create(user=user)
+    profile = UserProfile.objects.create(user=user,calls_remaining=1)
 
     return JsonResponse({'token': token.key}, status=201)
 
@@ -60,13 +82,38 @@ def signin(request):
 
     return JsonResponse({'token': token.key}, status=200)
 
+def verify_token(request):
+    auth_header = request.headers.get('Authorization')
+
+    if auth_header and auth_header.startswith('Bearer '):
+        token_key = auth_header.split('Bearer ')[1].strip()
+        try:
+            token = Token.objects.get(key=token_key)
+            return token.user
+        except Token.DoesNotExist:
+            raise Exception('Invalid token.')
+    else:
+        raise Exception('Token not provided.')
+
 
 @require_GET
-def compare_countries(request, country1, country2):
+def compare_countries(request, currency, country1, country2):
+    user = None
+
+    try:
+        user = verify_token(request)
+        # Rest of your code...
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=401)
+
+    profile = UserProfile.objects.get(user=user)
+    if profile.calls_remaining == 0:
+        return JsonResponse({'error': "No API calls left"})
+
     # Формируем URL для запроса данных первой страны
-    url1 = f"http://api:3000/{country1}"
+    url1 = f"http://api:3000/{country1}?currency={currency}"
     # Формируем URL для запроса данных второй страны
-    url2 = f"http://api:3000/{country2}"
+    url2 = f"http://api:3000/{country2}?currency={currency}"
 
     try:
         # Выполняем GET-запросы для получения данных
@@ -106,6 +153,10 @@ def compare_countries(request, country1, country2):
                 "absolute_difference": absolute_difference,
                 "relative_difference": relative_difference
                 }
+
+            profile.calls_remaining -= 1
+            profile.save()
+
             return JsonResponse(response_data, status=200)
         else:
             # Один из запросов вернул ошибку
@@ -147,3 +198,70 @@ def calculate_difference(data1, data2):
             relative_change[key] = value2
 
     return absolute_change, relative_change
+
+
+@require_POST
+@csrf_exempt
+def stripe_checkout(request, qty): 
+    user = verify_token(request);
+
+    session = stripe.checkout.Session.create(
+        line_items=[{
+        'price_data': {
+            'currency': 'usd',
+            'product_data': {
+            'name': '%s API calls' % qty,
+            },
+            'unit_amount': 1000,
+        },
+        'quantity': qty,
+        }],
+        mode='payment',
+        client_reference_id=user.id,
+        success_url='http://localhost:8080/home',
+        cancel_url='http://localhost:8080/home',
+    )
+
+    return JsonResponse({"url": session.url})
+
+@require_GET
+def get_calls_remaining(request): 
+    user = verify_token(request);
+    user_profile = UserProfile.objects.get(user=user);
+
+    return JsonResponse({"calls_remaining": user_profile.calls_remaining})
+
+
+
+
+@csrf_exempt
+def stripe_webhook(request):
+    event = None
+    payload = request.body
+    sig_header = request.headers['STRIPE_SIGNATURE']
+
+    print(request.body)
+    print(request.headers)
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
+        )
+    except ValueError as e:
+        raise e
+    except stripe.error.SignatureVerificationError as e:
+        raise e
+
+    if event.type == 'checkout.session.completed':
+        session = event.data.object
+        checkout = stripe.checkout.Session.retrieve(session['id'], expand=["line_items"])
+        user = User.objects.get(id=session['client_reference_id'])
+        print(checkout)
+        user_profile = UserProfile.objects.get(user=user)
+
+        user_profile.calls_remaining += checkout['line_items']['data'][0]["quantity"]
+        user_profile.save()
+    else:
+        print('Unhandled event type {}'.format(event.type))
+
+    return JsonResponse({'success': True})

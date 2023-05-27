@@ -20,7 +20,7 @@ app.get('/:country', async (req, res) => {
   const { currency = 'CAD' } = req.query;
 
   const response = await fetch(
-    `https://www.numbeo.com/cost-of-living/country_result.jsp?country=${country}`,
+    `https://www.numbeo.com/cost-of-living/country_result.jsp?country=${country}&displayCurrency=${currency}`,
   );
   if (!response.ok) {
     return res.status(response.status).send(response.statusText);

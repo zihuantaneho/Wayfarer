@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import axios from "axios";
+import {compare} from "../api";
 import { getData } from "country-list";
 import { useNavigate } from "react-router-dom";
+import { BarChart } from "../components";
 
 const countries = getData();
 
@@ -9,6 +10,7 @@ export const ComparePage = () => {
   const [country1, setCountry1] = useState("");
   const [country2, setCountry2] = useState("");
   const [comparisonData, setComparisonData] = useState(null);
+  const [currency, setCurrency] = useState("EUR");
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
@@ -20,10 +22,11 @@ export const ComparePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setError("")
+    setComparisonData(null)
+
     try {
-      const response = await axios.get(
-        `http://backend:8000/compare/${country1}/${country2}`
-      );
+      const response = await compare(country1, country2, currency);
       setComparisonData(response.data);
     } catch (error) {
       setComparisonData(null);
@@ -49,7 +52,7 @@ export const ComparePage = () => {
     }
 
     return (
-      <table className="table-auto border-collapse border border-gray-400 dark:border-gray-600">
+      <table className="table-auto border border-gray-400 dark:border-gray-600">
         <thead>
           <tr className="bg-gray-200 dark:bg-gray-700">
             <th className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm font-medium dark:text-white">
@@ -89,13 +92,13 @@ export const ComparePage = () => {
                 {cost.item}
               </td>
               <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
-                {cost.cost}
+                {cost.cost} {currency}
               </td>
               <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
-                {comparisonData.country2.costs[index].cost}
+                {comparisonData.country2.costs[index].cost} {currency}
               </td>
               <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
-                {comparisonData.absolute_difference.costs[index].cost}
+                {comparisonData.absolute_difference.costs[index].cost} {currency}
               </td>
               <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
                 {(
@@ -170,6 +173,27 @@ export const ComparePage = () => {
             })}
           </select>
         </div>
+
+        <div className="flex flex-col sm:flex-row gap-2">
+          <label htmlFor="currency" className="sm:w-1/3 dark:text-white">
+          Currency
+          </label>
+          <select
+            id="currency"
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            className="dark:bg-gray-700 dark:text-white"
+          >
+            {["EUR", "USD", "UAH"].map((currency) => {
+                return (
+                  <option key={currency} value={currency}>
+                    {currency}
+                  </option>
+                );
+            })}
+          </select>
+        </div>
+
         <div className="flex flex-row space-x-5">
           <button
             type="submit"
@@ -186,7 +210,72 @@ export const ComparePage = () => {
           </button>
         </div>
       </form>
+      <div className="flex-row flex space-x-4">
+      {comparisonData && (
+      <div className="space-y-4">
+      <BarChart 
+        shouldMapValues={false}
+        value1={comparisonData.country1.costs[53].cost}
+        value2={comparisonData.country2.costs[53].cost}
+        label1={country1}
+        label2={country2}
+        title="Avg. Salary"
+      />
+      <BarChart 
+        shouldMapValues={true}
+        value1={comparisonData.country1.costs[2].cost}
+        value2={comparisonData.country2.costs[2].cost}
+        label1={country1}
+        label2={country2}
+        title="McMeal Index"
+      />
+      <BarChart 
+        shouldMapValues={false}
+        value1={comparisonData.country1.costs[35].cost}
+        value2={comparisonData.country2.costs[35].cost}
+        label1={country1}
+        label2={country2}
+        title="Utilities"
+      />
+      <BarChart 
+        shouldMapValues={false}
+        value1={comparisonData.country1.costs[40].cost}
+        value2={comparisonData.country2.costs[40].cost}
+        label1={country1}
+        label2={country2}
+        title="Cinema"
+      />
+
+      <BarChart 
+        shouldMapValues={false}
+        value1={comparisonData.country1.costs[47].cost}
+        value2={comparisonData.country2.costs[47].cost}
+        label1={country1}
+        label2={country2}
+        title="1 Bedroom Apt."
+      />
+
+      <BarChart 
+        shouldMapValues={false}
+        value1={comparisonData.country1.costs[49].cost}
+        value2={comparisonData.country2.costs[49].cost}
+        label1={country1}
+        label2={country2}
+        title="3 Bedroom Apt."
+      />
+
+      <BarChart 
+        shouldMapValues={false}
+        value1={comparisonData.country1.costs[37].cost}
+        value2={comparisonData.country2.costs[37].cost}
+        label1={country1}
+        label2={country2}
+        title="Internet"
+      />
+      </div>
+      )}
       <div id="country-table">{renderComparisonTable()}</div>
+    </div>
     </div>
   );
 };

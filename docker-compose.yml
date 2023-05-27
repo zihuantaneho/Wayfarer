@@ -9,11 +9,16 @@ services:
     container_name: backend
     build: backend
     restart: unless-stopped
+    environment:
+      - STRIPE_API_KEY=sk_test_51HFGmbL6ej6rkcOPZAgfDDeKg4At624zhc0PWSaZoUlDFk7lEGDqmWdI8oekiq4AmX78HzkEYS3GH9DmdmB6NV4e00dRev9Thx
+      - STRIPE_WEBHOOK_SECRET=whsec_812d5fcb03d92761efe432f9300385ead5ffc68c1afb4e60e22047f46f354395
     ports:
       - 8000:8000
+    volumes:
+      - ./db:/var/database:rw
   api:
     container_name: api
     build: api
     restart: unless-stopped
-    ports:
-      - 3000:3000
+    expose:
+      - 3000
