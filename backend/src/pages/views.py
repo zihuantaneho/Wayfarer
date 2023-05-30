@@ -20,7 +20,7 @@ import logging
 
 #TODO: env
 #stripe.api_key = "sk_test_51HFGmbL6ej6rkcOPZAgfDDeKg4At624zhc0PWSaZoUlDFk7lEGDqmWdI8oekiq4AmX78HzkEYS3GH9DmdmB6NV4e00dRev9Thx"
-#endpoint_secret = "whsec_812d5fcb03d92761efe432f9300385ead5ffc68c1afb4e60e22047f46f354395" 
+#endpoint_secret = "whsec_812d5fcb03d92761efe432f9300385ead5ffc68c1afb4e60e22047f46f354395"
 
 stripe.api_key = os.environ["STRIPE_API_KEY"]
 endpoint_secret = os.environ["STRIPE_WEBHOOK_SECRET"]
@@ -59,7 +59,7 @@ def signup(request):
 
     user = User.objects.create_user(username=username, password=password)
     token = Token.objects.create(user=user)
-    profile = UserProfile.objects.create(user=user,calls_remaining=1)
+    profile = UserProfile.objects.create(user=user,calls_remaining=5)
 
     return JsonResponse({'token': token.key}, status=201)
 
@@ -202,7 +202,7 @@ def calculate_difference(data1, data2):
 
 @require_POST
 @csrf_exempt
-def stripe_checkout(request, qty): 
+def stripe_checkout(request, qty):
     user = verify_token(request);
 
     session = stripe.checkout.Session.create(
@@ -212,7 +212,7 @@ def stripe_checkout(request, qty):
             'product_data': {
             'name': '%s API calls' % qty,
             },
-            'unit_amount': 1000,
+            'unit_amount': 100,
         },
         'quantity': qty,
         }],
@@ -225,7 +225,7 @@ def stripe_checkout(request, qty):
     return JsonResponse({"url": session.url})
 
 @require_GET
-def get_calls_remaining(request): 
+def get_calls_remaining(request):
     user = verify_token(request);
     user_profile = UserProfile.objects.get(user=user);
 

@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'Fixel';
+    src: url("./fonts/FixelVariable.ttf") format('ttf');
+  }
+
+  * {
+    font-family: 'Fixel', sans-serif;
+  }

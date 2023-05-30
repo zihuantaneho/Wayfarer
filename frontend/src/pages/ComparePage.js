@@ -27,7 +27,15 @@ export const ComparePage = () => {
 
     try {
       const response = await compare(country1, country2, currency);
-      setComparisonData(response.data);
+
+      if (response.data.error) {
+        setComparisonData(null);
+        setError(response.data.error);
+      } else {
+        setComparisonData(response.data);
+        setError("");
+      }
+
     } catch (error) {
       setComparisonData(null);
       setError(error.response.data.error);
@@ -213,7 +221,7 @@ export const ComparePage = () => {
       <div className="flex-row flex space-x-4">
       {comparisonData && (
       <div className="space-y-4">
-      <BarChart 
+      <BarChart
         shouldMapValues={false}
         value1={comparisonData.country1.costs[53].cost}
         value2={comparisonData.country2.costs[53].cost}
@@ -221,7 +229,7 @@ export const ComparePage = () => {
         label2={country2}
         title="Avg. Salary"
       />
-      <BarChart 
+      <BarChart
         shouldMapValues={true}
         value1={comparisonData.country1.costs[2].cost}
         value2={comparisonData.country2.costs[2].cost}
@@ -229,7 +237,7 @@ export const ComparePage = () => {
         label2={country2}
         title="McMeal Index"
       />
-      <BarChart 
+      <BarChart
         shouldMapValues={false}
         value1={comparisonData.country1.costs[35].cost}
         value2={comparisonData.country2.costs[35].cost}
@@ -237,7 +245,7 @@ export const ComparePage = () => {
         label2={country2}
         title="Utilities"
       />
-      <BarChart 
+      <BarChart
         shouldMapValues={false}
         value1={comparisonData.country1.costs[40].cost}
         value2={comparisonData.country2.costs[40].cost}
@@ -246,7 +254,7 @@ export const ComparePage = () => {
         title="Cinema"
       />
 
-      <BarChart 
+      <BarChart
         shouldMapValues={false}
         value1={comparisonData.country1.costs[47].cost}
         value2={comparisonData.country2.costs[47].cost}
@@ -255,7 +263,7 @@ export const ComparePage = () => {
         title="1 Bedroom Apt."
       />
 
-      <BarChart 
+      <BarChart
         shouldMapValues={false}
         value1={comparisonData.country1.costs[49].cost}
         value2={comparisonData.country2.costs[49].cost}
@@ -264,7 +272,7 @@ export const ComparePage = () => {
         title="3 Bedroom Apt."
       />
 
-      <BarChart 
+      <BarChart
         shouldMapValues={false}
         value1={comparisonData.country1.costs[37].cost}
         value2={comparisonData.country2.costs[37].cost}

@@ -6,7 +6,7 @@ const htmlElement = document.documentElement;
 
 export const SettingsPage = () => {
   const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("darkMode") === "true" 
+    localStorage.getItem("darkMode") === "true"
   );
   const [callsRemaining, setCallsRemaining] = useState(0);
   const [apiCallsToPurchase, setApiCallsToPurchase] = useState(0);
@@ -85,7 +85,7 @@ export const SettingsPage = () => {
         </div>
         <div className="flex items-center mb-4">
           <span className="mr-2 dark:text-white">API Calls Remaining:</span>
-          <span>{callsRemaining}</span>
+          <span className="dark:text-white">{callsRemaining}</span>
         </div>
         <div className="flex items-center mb-4">
           <span className="mr-2 dark:text-white">API Calls to Purchase:</span>

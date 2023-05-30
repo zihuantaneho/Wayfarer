@@ -10,8 +10,8 @@ services:
     build: backend
     restart: unless-stopped
     environment:
-      - STRIPE_API_KEY=sk_test_51HFGmbL6ej6rkcOPZAgfDDeKg4At624zhc0PWSaZoUlDFk7lEGDqmWdI8oekiq4AmX78HzkEYS3GH9DmdmB6NV4e00dRev9Thx
-      - STRIPE_WEBHOOK_SECRET=whsec_812d5fcb03d92761efe432f9300385ead5ffc68c1afb4e60e22047f46f354395
+      - STRIPE_API_KEY=sk_test_51NCpL6KT8uPcLM74tGAIIwe3S3TzFVCh5a7QNUHwTsTUsOVOxna5XbjepcKoQJCS2rjcon676224r4bJd01yZlCy00bn9EBKLv
+      - STRIPE_WEBHOOK_SECRET=whsec_7699535948da82a84616018de9588286b8bf01c78924134e48ea09da3ea737be
     ports:
       - 8000:8000
     volumes:
