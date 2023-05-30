@@ -38,7 +38,7 @@ export const SignInPage = () => {
       />
       <button
         onClick={onSignIn}
-        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded dark:bg-blue-600 dark:hover:bg-blue-700"
+        className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded dark:bg-yellow-600 dark:hover:bg-yellow-700"
       >
         Sign In
       </button>

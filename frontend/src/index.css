@@ -5,3 +5,22 @@
 * {
   transition: all 0.2s ease;
 }
+
+.switch input:checked + .slider:before {
+  background-color: yellow;
+}
+
+.switch input:checked + .slider:after {
+  background-color: white;
+}
+
+/* Стили для тёмной темы */
+@media (prefers-color-scheme: dark) {
+  .switch input:checked + .slider:before {
+    background-color: orange;
+  }
+
+  .switch input:checked + .slider:after {
+    background-color: black;
+  }
+}

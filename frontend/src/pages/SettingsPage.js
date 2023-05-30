@@ -66,7 +66,7 @@ export const SettingsPage = () => {
           <div className="self-baseline">
             <button
               onClick={onBack}
-              className="self-baseline bg-gray-200 dark:bg-gray-700 hover:bg-blue-600 dark:md:hover:bg-gray-400 text-black dark:text-white font-semibold py-2 px-4 rounded w-full"
+              className="self-baseline bg-gray-200 dark:bg-gray-700 hover:bg-yellow-600 dark:md:hover:bg-gray-400 text-black dark:text-white font-semibold py-2 px-4 rounded w-full"
             >
               Go Back
             </button>
@@ -90,6 +90,7 @@ export const SettingsPage = () => {
         <div className="flex items-center mb-4">
           <span className="mr-2 dark:text-white">API Calls to Purchase:</span>
           <input
+            className="w-12 bg-gray-200 dark:bg-white text-black dark:text-black"
             type="number"
             value={apiCallsToPurchase}
             onChange={handleApiCallsChange}
@@ -99,7 +100,7 @@ export const SettingsPage = () => {
         <div className="mb-12">
           <button
             onClick={redirectToCheckout}
-            className="bg-transparent hover:bg-blue-500 text-blue-500 hover:text-white border border-blue-500 hover:border-transparent font-semibold py-2 px-4 rounded w-full dark:text-blue-500 dark:hover:bg-blue-800 dark:border-blue-500 dark:hover:text-white"
+            className="bg-transparent hover:bg-yellow-500 text-yellow-500 hover:text-white border border-yellow-500 hover:border-transparent font-semibold py-2 px-4 rounded w-full dark:text-yellow-500 dark:hover:bg-yellow-800 dark:border-yellow-500 dark:hover:text-white"
             disabled={apiCallsToPurchase <= 0}
           >
             Purchase and Checkout

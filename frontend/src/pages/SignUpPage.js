@@ -50,14 +50,14 @@ export const SignUpPage = () => {
       />
       <button
         onClick={handleSignUp}
-        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+        className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded"
       >
         Sign Up
       </button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
       <div className="mt-4">
         <span>Already have an account? </span>
-        <Link to="/sign-in" className="text-blue-500 underline">
+        <Link to="/sign-in" className="text-yellow-500 underline">
           Sign In
         </Link>
       </div>

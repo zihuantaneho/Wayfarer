@@ -205,14 +205,14 @@ export const ComparePage = () => {
         <div className="flex flex-row space-x-5">
           <button
             type="submit"
-            className="bg-gray-300 hover:bg-blue-700 dark:bg-gray-700 dark:md:hover:bg-gray-400 self-baseline text-black dark:text-white font-bold py-2 px-4 rounded"
+            className="bg-gray-300 hover:bg-yellow-700 dark:bg-gray-700 dark:md:hover:bg-gray-400 self-baseline text-black dark:text-white font-bold py-2 px-4 rounded"
             onClick={onGoHome}
           >
             Go Home
           </button>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 self-baseline text-white font-bold py-2 px-4 rounded"
+            className="bg-yellow-500 hover:bg-yellow-700 self-baseline text-white font-bold py-2 px-4 rounded"
           >
             Compare
           </button>

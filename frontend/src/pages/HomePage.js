@@ -89,13 +89,13 @@ export const HomePage = () => {
         {token ? (
           <div className="space-y-2">
             <button
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded w-full"
+              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded w-full"
               onClick={onCompare}
             >
               Compare
             </button>
             <button
-              className="bg-gray-200 dark:bg-gray-700 hover:bg-blue-600 dark:md:hover:bg-gray-400 text-black dark:text-white font-semibold py-2 px-4 rounded w-full"
+              className="bg-gray-200 dark:bg-gray-700 hover:bg-yellow-600 dark:md:hover:bg-gray-400 text-black dark:text-white font-semibold py-2 px-4 rounded w-full"
               onClick={onSettings}
             >
               Settings
@@ -104,7 +104,7 @@ export const HomePage = () => {
         ) : (
           <div className="flex justify-center space-x-4">
             <button
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded"
               onClick={onSignUp}
             >
               Sign Up
