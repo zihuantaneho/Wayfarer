@@ -108,12 +108,12 @@ def compare_countries(request, currency, country1, country2):
 
     profile = UserProfile.objects.get(user=user)
     if profile.calls_remaining == 0:
-        return JsonResponse({'error': "No API calls left"})
+        return JsonResponse({'error': "No compare counts left"})
 
     # Формируем URL для запроса данных первой страны
-    url1 = f"http://api:3000/{country1}?currency={currency}"
+    url1 = f"http://localhost:3000/{country1}?currency={currency}"
     # Формируем URL для запроса данных второй страны
-    url2 = f"http://api:3000/{country2}?currency={currency}"
+    url2 = f"http://localhost:3000/{country2}?currency={currency}"
 
     try:
         # Выполняем GET-запросы для получения данных
@@ -218,7 +218,7 @@ def stripe_checkout(request, qty):
         'price_data': {
             'currency': 'usd',
             'product_data': {
-            'name': '%s API calls' % qty,
+            'name': '%s calls' % qty,
             },
             'unit_amount': 100,
         },
