@@ -19,13 +19,13 @@ import stripe
 import logging
 
 #TODO: env
-#stripe.api_key = "sk_test_51HFGmbL6ej6rkcOPZAgfDDeKg4At624zhc0PWSaZoUlDFk7lEGDqmWdI8oekiq4AmX78HzkEYS3GH9DmdmB6NV4e00dRev9Thx"
-#endpoint_secret = "whsec_812d5fcb03d92761efe432f9300385ead5ffc68c1afb4e60e22047f46f354395"
+#stripe.api_key = ""
+#endpoint_secret = ""
 
 stripe.api_key = os.environ["STRIPE_API_KEY"]
 endpoint_secret = os.environ["STRIPE_WEBHOOK_SECRET"]
 
-#"whsec_R4hsnsQ3Dfwnu5H6sLYjMw5QBLcLU5hc"
+#"_R4hsnsQ3Dfwnu5H6sLYjMw5QBLcLU5hc"
 
 logging.basicConfig()
 logger = logging.getLogger('backend_views')
@@ -188,8 +188,8 @@ def calculate_difference(data1, data2):
                 value1_decimal = Decimal(value1.replace(',', ''))
                 value2_decimal = Decimal(value2.replace(',', ''))
 
-                absolute_change[key] = float(value1_decimal - value2_decimal)
-                relative_change[key] = float((value1_decimal - value2_decimal) / value2_decimal) if value2_decimal != 0 else None
+                absolute_change[key] = float(value2_decimal - value1_decimal)
+                relative_change[key] = float((value2_decimal - value1_decimal) / value1_decimal) if value1_decimal != 0 else None
             else:
                 absolute_change[key] = value1
                 relative_change[key] = value2
@@ -199,6 +199,14 @@ def calculate_difference(data1, data2):
 
     return absolute_change, relative_change
 
+@require_POST
+@csrf_exempt
+def delete_user(request):
+    user = verify_token(request);
+
+    user.delete();
+
+    return JsonResponse({"status": "ok"})
 
 @require_POST
 @csrf_exempt

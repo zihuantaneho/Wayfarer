@@ -50,7 +50,10 @@ app.get('/:country', async (req, res) => {
         high: rangeHigh,
       },
     };
-  });
+  })
+
+  costs.pop()
+
   return res.json({ country, currency, costs });
 });
 

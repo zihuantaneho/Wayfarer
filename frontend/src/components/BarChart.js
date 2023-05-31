@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
 const WIDTH = 200;
-const HEIGHT = 291;
+const HEIGHT = 318;
 
 export const BarChart = ({ value1: _value1, value2: _value2, label1, label2, title, shouldMapValues }) => {
   const value1 = _value1.replace(",", "");
@@ -67,7 +67,7 @@ export const BarChart = ({ value1: _value1, value2: _value2, label1, label2, tit
   return (
       <svg
         ref={chartRef}
-        className="bg-white border rounded-md"
+        className="bg-white border-gray-400 border dark:border-gray-500 rounded-md"
         width={WIDTH}
         height={HEIGHT}
       ></svg>

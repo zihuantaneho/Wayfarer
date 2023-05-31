@@ -38,7 +38,7 @@ export const HomePage = () => {
 
   const renderTopCountriesTable = () => {
     if (topCountries.length === 0) {
-      return <p>Nobody has queried anything yet</p>;
+      return <p className="dark:text-white" >Nobody has queried anything yet</p>;
     }
 
     return (

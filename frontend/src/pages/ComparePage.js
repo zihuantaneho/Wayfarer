@@ -3,6 +3,9 @@ import {compare} from "../api";
 import { getData } from "country-list";
 import { useNavigate } from "react-router-dom";
 import { BarChart } from "../components";
+import cc from "currency-codes";
+
+const currencies = ["EUR", "USD", "UAH", ...cc.codes()];
 
 const countries = getData();
 
@@ -10,10 +13,13 @@ export const ComparePage = () => {
   const [country1, setCountry1] = useState("");
   const [country2, setCountry2] = useState("");
   const [comparisonData, setComparisonData] = useState(null);
+  const [search, setSearch] = useState("");
   const [currency, setCurrency] = useState("EUR");
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
+
+  const handleSearch = (e) => setSearch(e.target.value);
 
   const onGoHome = () => {
     navigate("/home");
@@ -63,28 +69,30 @@ export const ComparePage = () => {
       <table className="table-auto border border-gray-400 dark:border-gray-600">
         <thead>
           <tr className="bg-gray-200 dark:bg-gray-700">
-            <th className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm font-medium dark:text-white">
-              #
-            </th>
-            <th className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm font-medium dark:text-white">
+            <th className="w-[40rem] border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm font-medium dark:text-white">
               Parameter
             </th>
-            <th className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm font-medium dark:text-white">
+            <th className="w-[8rem] border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm font-medium dark:text-white">
               {comparisonData.country1.country}
             </th>
-            <th className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm font-medium dark:text-white">
+            <th className="w-[8rem] border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm font-medium dark:text-white">
               {comparisonData.country2.country}
             </th>
-            <th className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm font-medium dark:text-white">
-              Absolute Difference
+            <th className="w-[8rem] border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm font-medium dark:text-white">
+              Difference
             </th>
-            <th className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm font-medium dark:text-white">
-              Relative Difference
+            <th className="w-[8rem] border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm font-medium dark:text-white">
+              % Difference
             </th>
           </tr>
         </thead>
         <tbody>
-          {comparisonData.country1.costs.map((cost, index) => (
+          {comparisonData.country1.costs.map((cost, index) => {
+            if (!cost.item.toLowerCase().includes(search.toLowerCase())) {
+              return null
+            }
+
+return (
             <tr
               key={index}
               className={
@@ -93,9 +101,6 @@ export const ComparePage = () => {
                   : "dark:bg-gray-900"
               }
             >
-              <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
-                {index + 1}
-              </td>
               <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
                 {cost.item}
               </td>
@@ -108,14 +113,20 @@ export const ComparePage = () => {
               <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
                 {comparisonData.absolute_difference.costs[index].cost} {currency}
               </td>
-              <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
+              <td className={
+              comparisonData.relative_difference.costs[index].cost > 0 ?
+                "border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm text-green-600 dark:text-green-200" :
+                "border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm text-red-600 dark:text-red-200"
+              }
+  >
                 {(
                   comparisonData.relative_difference.costs[index].cost * 100
                 ).toFixed(0)}
                 %
               </td>
             </tr>
-          ))}
+          )
+          })}
         </tbody>
       </table>
     );
@@ -192,7 +203,7 @@ export const ComparePage = () => {
             onChange={(e) => setCurrency(e.target.value)}
             className="dark:bg-gray-700 dark:text-white"
           >
-            {["EUR", "USD", "UAH"].map((currency) => {
+            {currencies.map((currency) => {
                 return (
                   <option key={currency} value={currency}>
                     {currency}
@@ -282,8 +293,61 @@ export const ComparePage = () => {
       />
       </div>
       )}
+    <div className="space-y-4">
+    {comparisonData && (
+      <div className="w-[40rem] border-gray-400 border dark:border-gray-500 p-6 rounded-lg">
+        <p className="dark:text-white" >Average salaries are {calculatePercentage(
+comparisonData.country1.costs[53].cost,
+comparisonData.country2.costs[53].cost
+        )} in {country1} than {country2}</p>
+
+        <p className="dark:text-white" >Water prices are {calculatePercentage(
+comparisonData.country1.costs[7].cost,
+comparisonData.country2.costs[7].cost
+        )} in {country1} than {country2}</p>
+
+        <p className="dark:text-white" >Gasoline prices are {calculatePercentage(
+comparisonData.country1.costs[32].cost,
+comparisonData.country2.costs[32].cost
+        )} in {country1} than {country2}</p>
+
+        <p className="dark:text-white" >Banana prices are {calculatePercentage(
+comparisonData.country1.costs[17].cost,
+comparisonData.country2.costs[17].cost
+        )} in {country1} than {country2}</p>
+
+        <p className="dark:text-white" >Soda prices are {calculatePercentage(
+comparisonData.country1.costs[6].cost,
+comparisonData.country2.costs[6].cost
+        )} in {country1} than {country2}</p>
+      </div>
+    )}
+
+    {comparisonData && (
+      <input
+        onChange={handleSearch}
+        placeholder="Parameter Filter"
+        type="text"
+        className="px-2 w-[40rem] rounded-md h-12 bg-gray-200 dark:bg-white text-black dark:text-black"
+      />
+    )}
       <div id="country-table">{renderComparisonTable()}</div>
+    </div>
     </div>
     </div>
   );
 };
+
+function calculatePercentage(_num1, _num2) {
+  const num1 = Number(_num1.replace(",", ""));
+  const num2 = Number(_num2.replace(",", ""));
+  console.log(num1, num2);
+
+  const difference = num2 - num1;
+  const percentage = (difference / num1) * 100;
+  if (percentage < 0) {
+    return   (<>{Math.abs(percentage).toFixed(2)}% <span className="text-red-600 dark:text-red-200">higher</span></>);
+  } else {
+    return   (<>{Math.abs(percentage).toFixed(2)}% <span className="text-green-600 dark:text-green-200" >lower</span></>);
+  }
+}

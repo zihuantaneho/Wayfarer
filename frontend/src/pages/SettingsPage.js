@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { logOut, getCheckoutUrl, getCallsRemaining } from "../api";
+import { logOut, deleteUser, getCheckoutUrl, getCallsRemaining } from "../api";
 
 const htmlElement = document.documentElement;
 
@@ -40,6 +40,11 @@ export const SettingsPage = () => {
   const onBack = () => {
     navigate("/home");
   };
+
+  const onDeleteAccount = async () => {
+    await deleteUser();
+    onLogOut();
+  }
 
   const onLogOut = () => {
     logOut();
@@ -106,12 +111,19 @@ export const SettingsPage = () => {
             Purchase and Checkout
           </button>
         </div>
-        <div>
+        <div className="space-y-4">
           <button
             onClick={onLogOut}
             className="bg-transparent hover:bg-red-500 text-red-500 hover:text-white border border-red-500 hover:border-transparent font-semibold py-2 px-4 rounded w-full dark:text-red-500 dark:hover:bg-red-800 dark:border-red-500 dark:hover:text-white"
           >
             Log Out
+          </button>
+
+          <button
+            onClick={onDeleteAccount}
+            className="bg-transparent hover:bg-red-500 text-red-500 hover:text-white border border-red-500 hover:border-transparent font-semibold py-2 px-4 rounded w-full dark:text-red-500 dark:hover:bg-red-800 dark:border-red-500 dark:hover:text-white"
+          >
+    Delete account
           </button>
         </div>
       </div>
