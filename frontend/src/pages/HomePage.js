@@ -20,6 +20,11 @@ export const HomePage = () => {
     }
   };
 
+
+  const onEstimate = () => {
+    navigate("/estimate");
+  };
+
   const onSettings = () => {
     navigate("/settings");
   };
@@ -42,7 +47,7 @@ export const HomePage = () => {
     }
 
     return (
-      <table className="table-auto border-collapse border border-gray-400 mt-4 dark:border-gray-700 dark:bg-gray-800">
+      <table className="table-auto w-full border-collapse border border-gray-400 mt-4 dark:border-gray-700 dark:bg-gray-800">
         <thead>
           <tr className="bg-gray-200 dark:bg-gray-700">
             <th className="border border-gray-400 px-4 py-2 text-black dark:text-white">#</th>
@@ -86,14 +91,25 @@ export const HomePage = () => {
         <h1 className="text-4xl text-center mb-6 dark:text-white">
           Welcome to Wayfarer!
         </h1>
+        <p className="mb-4 text-black dark:text-white">
+    Wayfarer is an app that allows you to compare the cost of living between two countries. You can also get an estimate of how much it would cost to live in a country based on your current salary.
+        </p>
+
         {token ? (
           <div className="space-y-2">
             <button
               className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded w-full"
               onClick={onCompare}
             >
-              Compare
+              Compare Countries
             </button>
+            <button
+              className="bg-gray-200 dark:bg-gray-700 hover:bg-yellow-600 dark:md:hover:bg-gray-400 text-black dark:text-white font-semibold py-2 px-4 rounded w-full"
+              onClick={onEstimate}
+            >
+          Cost of Living Estimate
+            </button>
+
             <button
               className="bg-gray-200 dark:bg-gray-700 hover:bg-yellow-600 dark:md:hover:bg-gray-400 text-black dark:text-white font-semibold py-2 px-4 rounded w-full"
               onClick={onSettings}

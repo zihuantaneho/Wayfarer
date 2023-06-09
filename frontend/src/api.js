@@ -2,6 +2,19 @@ import axios from "axios";
 
 export let token = localStorage.getItem("token"); //'';
 
+export const getNewIncome = async (income, currency, country1, country2) => {
+  const response = await fetch(`http://localhost:8000/estimate/${income}/${currency}/${country1}/${country2}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const {new_income} = await response.json();
+
+  return new_income;
+}
+
 export const signIn = async (username, password) => {
   try {
     const response = await fetch("http://localhost:8000/signin", {
@@ -109,4 +122,15 @@ export const deleteUser = () => {
     .then(() => {
       logOut();
     });
+};
+
+export const getApiPayments = () => {
+  const url = `http://localhost:8000/api_payments`;
+
+  const headers = {
+    Authorization: `Bearer ${token}`,
+  };
+
+  return fetch(url, { headers, method: "GET" })
+    .then((r) => r.json())
 };

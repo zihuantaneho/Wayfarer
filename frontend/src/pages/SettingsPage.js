@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { logOut, deleteUser, getCheckoutUrl, getCallsRemaining } from "../api";
+import {
+  logOut,
+  deleteUser,
+  getCheckoutUrl,
+  getCallsRemaining,
+  getApiPayments,
+} from "../api";
 
 const htmlElement = document.documentElement;
 
@@ -10,6 +16,14 @@ export const SettingsPage = () => {
   );
   const [callsRemaining, setCallsRemaining] = useState(0);
   const [apiCallsToPurchase, setApiCallsToPurchase] = useState(0);
+
+  const [paymentHistory, setPaymentHistory] = useState([]);
+
+  const fetchPaymentHistory = () => {
+    getApiPayments().then((history) => {
+      setPaymentHistory(history.api_payments);
+    });
+  };
 
   const fetchCallsRemaining = () => {
     getCallsRemaining()
@@ -22,6 +36,7 @@ export const SettingsPage = () => {
   };
 
   useEffect(() => {
+    fetchPaymentHistory();
     fetchCallsRemaining();
   }, []);
 
@@ -44,7 +59,7 @@ export const SettingsPage = () => {
   const onDeleteAccount = async () => {
     await deleteUser();
     onLogOut();
-  }
+  };
 
   const onLogOut = () => {
     logOut();
@@ -62,7 +77,7 @@ export const SettingsPage = () => {
   };
 
   return (
-    <div className="bg-gray-100 h-screen flex items-center justify-center dark:bg-gray-800">
+    <div className="bg-gray-100 h-screen flex flex-col space-y-4 items-center justify-center dark:bg-gray-800">
       <div className="w-[32rem] bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold flex-1 mb-4 dark:text-white">
@@ -123,9 +138,50 @@ export const SettingsPage = () => {
             onClick={onDeleteAccount}
             className="bg-transparent hover:bg-red-500 text-red-500 hover:text-white border border-red-500 hover:border-transparent font-semibold py-2 px-4 rounded w-full dark:text-red-500 dark:hover:bg-red-800 dark:border-red-500 dark:hover:text-white"
           >
-    Delete account
+            Delete account
           </button>
         </div>
+      </div>
+
+      <div className="w-[32rem] h-[30%] overflow-scroll bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold flex-1 mb-4 dark:text-white">
+            Payment History
+          </h1>
+        </div>
+
+        <table className="min-w-full divide-y divide-gray-200 border border-gray-400 dark:border-gray-600">
+          <thead className="bg-gray-200 dark:bg-gray-700 border border-gray-400 dark:border-gray-600">
+            <tr>
+              <th className="w-[4rem] border border-gray-400 dark:border-gray-600 py-3 text-sm font-medium dark:text-white">
+                Qty
+              </th>
+              <th className="border border-gray-400 dark:border-gray-600 py-3 text-sm font-medium dark:text-white">
+                Amount Paid
+              </th>
+              <th className="border border-gray-400 dark:border-gray-600 py-3 text-sm font-medium dark:text-white">
+                Date
+              </th>
+            </tr>
+          </thead>
+          {paymentHistory.length && (
+            <tbody className="divide-y divide-gray-200">
+              {paymentHistory.map((payment, index) => (
+                <tr key={index}>
+                  <td className="px-4 items-center border border-gray-400 dark:border-gray-600 py-4 text-sm dark:text-white">
+                    {payment.qty}
+                  </td>
+                  <td className="px-4 border border-gray-400 dark:border-gray-600 py-4 text-sm dark:text-white">
+                    {payment.amount_paid / 100}
+                  </td>
+                  <td className="px-4 border border-gray-400 dark:border-gray-600 py-4 text-sm dark:text-white">
+                    {payment.date}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          )}
+        </table>
       </div>
     </div>
   );

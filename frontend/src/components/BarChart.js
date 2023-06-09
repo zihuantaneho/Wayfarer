@@ -11,6 +11,8 @@ export const BarChart = ({ value1: _value1, value2: _value2, label1, label2, tit
   const chartRef = useRef(null);
 
   useEffect(() => {
+    const isDarkMode = document.documentElement.classList.contains("dark");
+
     const svg = d3.select(chartRef.current);
     const margin = { top: 20, right: 20, bottom: 30, left: 50 };
     const width = WIDTH - margin.left - margin.right;
@@ -50,15 +52,19 @@ export const BarChart = ({ value1: _value1, value2: _value2, label1, label2, tit
 
     chart
       .append('g')
+      .attr('color', isDarkMode ? 'white' : "black")
       .attr('transform', `translate(0,${height + PADDING_TOP})`)
       .call(d3.axisBottom(x));
 
-    chart.append('g').attr('transform', `translate(0,${PADDING_TOP})`).call(d3.axisLeft(y));
+    chart.append('g')
+      .attr('color', isDarkMode ? 'white' : "black")
+      .attr('transform', `translate(0,${PADDING_TOP})`).call(d3.axisLeft(y));
 
     // Add chart title
     svg
       .append('text')
       .attr('x', width / 2 + margin.left)
+      .attr('fill', isDarkMode ? 'white' : "black")
       .attr('y', margin.top / 2 + 12)
       .attr('text-anchor', 'middle')
       .text(title);
@@ -67,7 +73,7 @@ export const BarChart = ({ value1: _value1, value2: _value2, label1, label2, tit
   return (
       <svg
         ref={chartRef}
-        className="bg-white border-gray-400 border dark:border-gray-500 rounded-md"
+        className="bg-white dark:bg-gray-800 border-gray-400 border dark:border-gray-500 rounded-md"
         width={WIDTH}
         height={HEIGHT}
       ></svg>

@@ -1,35 +1,48 @@
-import React, { useState } from "react";
-import {compare} from "../api";
-import { getData } from "country-list";
+import React, { useState, useEffect } from "react";
+import { compare } from "../api";
 import { useNavigate } from "react-router-dom";
 import { BarChart } from "../components";
-import cc from "currency-codes";
+import { countries, currencies } from "../countriesAndCurrencies";
+import html2canvas from "html2canvas";
+import * as jspdf from "jspdf";
 
-const currencies = ["EUR", "USD", "UAH", ...cc.codes()];
-
-const countries = getData();
+window.html2canvas = html2canvas;
 
 export const ComparePage = () => {
-  const [country1, setCountry1] = useState("");
-  const [country2, setCountry2] = useState("");
+  const url = new URL(window.location.href);
+
+  const [country1, setCountry1] = useState(
+    url.searchParams.get("country1") || ""
+  );
+  const [country2, setCountry2] = useState(
+    url.searchParams.get("country2") || ""
+  );
   const [comparisonData, setComparisonData] = useState(null);
   const [search, setSearch] = useState("");
-  const [currency, setCurrency] = useState("EUR");
+  const [currency, setCurrency] = useState(
+    url.searchParams.get("currency") || "EUR"
+  );
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
   const handleSearch = (e) => setSearch(e.target.value);
 
+  useEffect(() => {
+    if (country1 && country2 && currency) {
+      handleSubmit();
+    }
+  }, []);
+
   const onGoHome = () => {
     navigate("/home");
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
 
-    setError("")
-    setComparisonData(null)
+    setError("");
+    setComparisonData(null);
 
     try {
       const response = await compare(country1, country2, currency);
@@ -41,7 +54,6 @@ export const ComparePage = () => {
         setComparisonData(response.data);
         setError("");
       }
-
     } catch (error) {
       setComparisonData(null);
       setError(error.response.data.error);
@@ -49,15 +61,20 @@ export const ComparePage = () => {
     }
   };
 
+  const onSavePDF = () => {
+    html2canvas(document.getElementById("content")).then(function (canvas) {
+      document.body.appendChild(canvas);
+      var imgdata = canvas.toDataURL("image/jpg");
+      var doc = new jspdf.jsPDF();
+      doc.addImage(imgdata, "JPG", 0, 0, 272, 352);
+      doc.save("sample.pdf");
+    });
+  };
+
   const renderComparisonTable = () => {
     if (error) {
-      return (
-        <p className="text-red-500 mt-2 dark:text-red-500">
-          {error}
-        </p>
-      );
+      return <p className="text-red-500 mt-2 dark:text-red-500">{error}</p>;
     }
-
 
     if (!comparisonData) return null;
 
@@ -89,43 +106,45 @@ export const ComparePage = () => {
         <tbody>
           {comparisonData.country1.costs.map((cost, index) => {
             if (!cost.item.toLowerCase().includes(search.toLowerCase())) {
-              return null
+              return null;
             }
 
-return (
-            <tr
-              key={index}
-              className={
-                index % 2 === 0
-                  ? "bg-gray-100 dark:bg-gray-800"
-                  : "dark:bg-gray-900"
-              }
-            >
-              <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
-                {cost.item}
-              </td>
-              <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
-                {cost.cost} {currency}
-              </td>
-              <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
-                {comparisonData.country2.costs[index].cost} {currency}
-              </td>
-              <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
-                {comparisonData.absolute_difference.costs[index].cost} {currency}
-              </td>
-              <td className={
-              comparisonData.relative_difference.costs[index].cost > 0 ?
-                "border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm text-green-600 dark:text-green-200" :
-                "border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm text-red-600 dark:text-red-200"
-              }
-  >
-                {(
-                  comparisonData.relative_difference.costs[index].cost * 100
-                ).toFixed(0)}
-                %
-              </td>
-            </tr>
-          )
+            return (
+              <tr
+                key={index}
+                className={
+                  index % 2 === 0
+                    ? "bg-gray-100 dark:bg-gray-800"
+                    : "dark:bg-gray-900"
+                }
+              >
+                <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
+                  {cost.item}
+                </td>
+                <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
+                  {cost.cost} {currency}
+                </td>
+                <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
+                  {comparisonData.country2.costs[index].cost} {currency}
+                </td>
+                <td className="border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm dark:text-white">
+                  {comparisonData.absolute_difference.costs[index].cost}{" "}
+                  {currency}
+                </td>
+                <td
+                  className={
+                    comparisonData.relative_difference.costs[index].cost > 0
+                      ? "border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm text-green-600 dark:text-green-200"
+                      : "border border-gray-400 dark:border-gray-600 px-4 py-2 text-sm text-red-600 dark:text-red-200"
+                  }
+                >
+                  {(
+                    comparisonData.relative_difference.costs[index].cost * 100
+                  ).toFixed(0)}
+                  %
+                </td>
+              </tr>
+            );
           })}
         </tbody>
       </table>
@@ -195,7 +214,7 @@ return (
 
         <div className="flex flex-col sm:flex-row gap-2">
           <label htmlFor="currency" className="sm:w-1/3 dark:text-white">
-          Currency
+            Currency
           </label>
           <select
             id="currency"
@@ -204,11 +223,11 @@ return (
             className="dark:bg-gray-700 dark:text-white"
           >
             {currencies.map((currency) => {
-                return (
-                  <option key={currency} value={currency}>
-                    {currency}
-                  </option>
-                );
+              return (
+                <option key={currency} value={currency}>
+                  {currency}
+                </option>
+              );
             })}
           </select>
         </div>
@@ -227,113 +246,141 @@ return (
           >
             Compare
           </button>
+          {comparisonData && (
+            <button
+              onClick={onSavePDF}
+              className="bg-yellow-500 hover:bg-yellow-700 self-baseline text-white font-bold py-2 px-4 rounded"
+            >
+              Save PDF Report
+            </button>
+          )}
         </div>
       </form>
-      <div className="flex-row flex space-x-4">
-      {comparisonData && (
-      <div className="space-y-4">
-      <BarChart
-        shouldMapValues={false}
-        value1={comparisonData.country1.costs[53].cost}
-        value2={comparisonData.country2.costs[53].cost}
-        label1={country1}
-        label2={country2}
-        title="Avg. Salary"
-      />
-      <BarChart
-        shouldMapValues={true}
-        value1={comparisonData.country1.costs[2].cost}
-        value2={comparisonData.country2.costs[2].cost}
-        label1={country1}
-        label2={country2}
-        title="McMeal Index"
-      />
-      <BarChart
-        shouldMapValues={false}
-        value1={comparisonData.country1.costs[35].cost}
-        value2={comparisonData.country2.costs[35].cost}
-        label1={country1}
-        label2={country2}
-        title="Utilities"
-      />
-      <BarChart
-        shouldMapValues={false}
-        value1={comparisonData.country1.costs[40].cost}
-        value2={comparisonData.country2.costs[40].cost}
-        label1={country1}
-        label2={country2}
-        title="Cinema"
-      />
+      <div id="content" className="dark:bg-gray-800 flex-row flex space-x-4">
+        {comparisonData && (
+          <div className="space-y-4">
+            <BarChart
+              shouldMapValues={false}
+              value1={comparisonData.country1.costs[53].cost}
+              value2={comparisonData.country2.costs[53].cost}
+              label1={country1}
+              label2={country2}
+              title="Avg. Salary"
+            />
+            <BarChart
+              shouldMapValues={true}
+              value1={comparisonData.country1.costs[2].cost}
+              value2={comparisonData.country2.costs[2].cost}
+              label1={country1}
+              label2={country2}
+              title="McMeal Index"
+            />
+            <BarChart
+              shouldMapValues={false}
+              value1={comparisonData.country1.costs[35].cost}
+              value2={comparisonData.country2.costs[35].cost}
+              label1={country1}
+              label2={country2}
+              title="Utilities"
+            />
+            <BarChart
+              shouldMapValues={false}
+              value1={comparisonData.country1.costs[40].cost}
+              value2={comparisonData.country2.costs[40].cost}
+              label1={country1}
+              label2={country2}
+              title="Cinema"
+            />
 
-      <BarChart
-        shouldMapValues={false}
-        value1={comparisonData.country1.costs[47].cost}
-        value2={comparisonData.country2.costs[47].cost}
-        label1={country1}
-        label2={country2}
-        title="1 Bedroom Apt."
-      />
+            <BarChart
+              shouldMapValues={false}
+              value1={comparisonData.country1.costs[47].cost}
+              value2={comparisonData.country2.costs[47].cost}
+              label1={country1}
+              label2={country2}
+              title="1 Bedroom Apt."
+            />
 
-      <BarChart
-        shouldMapValues={false}
-        value1={comparisonData.country1.costs[49].cost}
-        value2={comparisonData.country2.costs[49].cost}
-        label1={country1}
-        label2={country2}
-        title="3 Bedroom Apt."
-      />
+            <BarChart
+              shouldMapValues={false}
+              value1={comparisonData.country1.costs[49].cost}
+              value2={comparisonData.country2.costs[49].cost}
+              label1={country1}
+              label2={country2}
+              title="3 Bedroom Apt."
+            />
 
-      <BarChart
-        shouldMapValues={false}
-        value1={comparisonData.country1.costs[37].cost}
-        value2={comparisonData.country2.costs[37].cost}
-        label1={country1}
-        label2={country2}
-        title="Internet"
-      />
+            <BarChart
+              shouldMapValues={false}
+              value1={comparisonData.country1.costs[37].cost}
+              value2={comparisonData.country2.costs[37].cost}
+              label1={country1}
+              label2={country2}
+              title="Internet"
+            />
+          </div>
+        )}
+        <div className="space-y-4">
+          {comparisonData && (
+            <div className="w-[40rem] border-gray-400 border dark:border-gray-500 p-6 rounded-lg">
+              <p className="dark:text-white">
+                Average salaries are{" "}
+                {calculatePercentage(
+                  comparisonData.country1.costs[53].cost,
+                  comparisonData.country2.costs[53].cost
+                )}{" "}
+                in {country1} than {country2}
+              </p>
+
+              <p className="dark:text-white">
+                Water prices are{" "}
+                {calculatePercentage(
+                  comparisonData.country1.costs[7].cost,
+                  comparisonData.country2.costs[7].cost
+                )}{" "}
+                in {country1} than {country2}
+              </p>
+
+              <p className="dark:text-white">
+                Gasoline prices are{" "}
+                {calculatePercentage(
+                  comparisonData.country1.costs[32].cost,
+                  comparisonData.country2.costs[32].cost
+                )}{" "}
+                in {country1} than {country2}
+              </p>
+
+              <p className="dark:text-white">
+                Banana prices are{" "}
+                {calculatePercentage(
+                  comparisonData.country1.costs[17].cost,
+                  comparisonData.country2.costs[17].cost
+                )}{" "}
+                in {country1} than {country2}
+              </p>
+
+              <p className="dark:text-white">
+                Soda prices are{" "}
+                {calculatePercentage(
+                  comparisonData.country1.costs[6].cost,
+                  comparisonData.country2.costs[6].cost
+                )}{" "}
+                in {country1} than {country2}
+              </p>
+            </div>
+          )}
+
+          {comparisonData && (
+            <input
+              onChange={handleSearch}
+              placeholder="Parameter Filter"
+              type="text"
+              className="px-2 w-[40rem] rounded-md h-12 bg-gray-200 dark:bg-gray-600 text-black dark:text-white"
+            />
+          )}
+          <div id="country-table">{renderComparisonTable()}</div>
+        </div>
       </div>
-      )}
-    <div className="space-y-4">
-    {comparisonData && (
-      <div className="w-[40rem] border-gray-400 border dark:border-gray-500 p-6 rounded-lg">
-        <p className="dark:text-white" >Average salaries are {calculatePercentage(
-comparisonData.country1.costs[53].cost,
-comparisonData.country2.costs[53].cost
-        )} in {country1} than {country2}</p>
-
-        <p className="dark:text-white" >Water prices are {calculatePercentage(
-comparisonData.country1.costs[7].cost,
-comparisonData.country2.costs[7].cost
-        )} in {country1} than {country2}</p>
-
-        <p className="dark:text-white" >Gasoline prices are {calculatePercentage(
-comparisonData.country1.costs[32].cost,
-comparisonData.country2.costs[32].cost
-        )} in {country1} than {country2}</p>
-
-        <p className="dark:text-white" >Banana prices are {calculatePercentage(
-comparisonData.country1.costs[17].cost,
-comparisonData.country2.costs[17].cost
-        )} in {country1} than {country2}</p>
-
-        <p className="dark:text-white" >Soda prices are {calculatePercentage(
-comparisonData.country1.costs[6].cost,
-comparisonData.country2.costs[6].cost
-        )} in {country1} than {country2}</p>
-      </div>
-    )}
-
-    {comparisonData && (
-      <input
-        onChange={handleSearch}
-        placeholder="Parameter Filter"
-        type="text"
-        className="px-2 w-[40rem] rounded-md h-12 bg-gray-200 dark:bg-white text-black dark:text-black"
-      />
-    )}
-      <div id="country-table">{renderComparisonTable()}</div>
-    </div>
-    </div>
     </div>
   );
 };
@@ -346,8 +393,18 @@ function calculatePercentage(_num1, _num2) {
   const difference = num2 - num1;
   const percentage = (difference / num1) * 100;
   if (percentage < 0) {
-    return   (<>{Math.abs(percentage).toFixed(2)}% <span className="text-red-600 dark:text-red-200">higher</span></>);
+    return (
+      <>
+        {Math.abs(percentage).toFixed(2)}%{" "}
+        <span className="text-red-600 dark:text-red-200">higher</span>
+      </>
+    );
   } else {
-    return   (<>{Math.abs(percentage).toFixed(2)}% <span className="text-green-600 dark:text-green-200" >lower</span></>);
+    return (
+      <>
+        {Math.abs(percentage).toFixed(2)}%{" "}
+        <span className="text-green-600 dark:text-green-200">lower</span>
+      </>
+    );
   }
 }

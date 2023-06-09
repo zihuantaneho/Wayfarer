@@ -5,8 +5,9 @@ from decimal import Decimal
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.db import models
-from pages.models import CountryQuery, UserProfile
+from pages.models import CountryQuery, UserProfile, ApiPayment
 from django.shortcuts import redirect
+from django.core import serializers
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -35,6 +36,7 @@ logger.setLevel(logging.DEBUG)
 @require_GET
 def top_queried_countries(request):
     top_countries = CountryQuery.objects.order_by('-num_queries')[:5]
+
     country_data = [
         {'country1': country.country1, 'country2': country.country2, 'num_queries': country.num_queries}
         for country in top_countries
@@ -95,6 +97,97 @@ def verify_token(request):
     else:
         raise Exception('Token not provided.')
 
+weights = {
+    "Meal, Inexpensive Restaurant": 1.0,
+    "Meal for 2 People, Mid-range Restaurant, Three-course": 1.0,
+    "McMeal at McDonalds (or Equivalent Combo Meal)": 1.0,
+    "Domestic Beer (0.5 liter draught)": 1.0,
+    "Imported Beer (0.33 liter bottle)": 1.0,
+    "Cappuccino (regular)": 1.0,
+    "Coke/Pepsi (0.33 liter bottle)": 1.0,
+    "Water (0.33 liter bottle)": 1.0,
+    "Milk (regular), (1 liter)": 1.0,
+    "Loaf of Fresh White Bread (500g)": 1.0,
+    "Rice (white), (1kg)": 1.0,
+    "Eggs (regular) (12)": 1.0,
+    "Local Cheese (1kg)": 1.0,
+    "Chicken Fillets (1kg)": 1.0,
+    "Beef Round (1kg) (or Equivalent Back Leg Red Meat)": 1.0,
+    "Apples (1kg)": 1.0,
+    "Banana (1kg)": 1.0,
+    "Oranges (1kg)": 1.0,
+    "Tomato (1kg)": 1.0,
+    "Potato (1kg)": 1.0,
+    "Onion (1kg)": 1.0,
+    "Lettuce (1 head)": 1.0,
+    "Water (1.5 liter bottle)": 1.0,
+    "Bottle of Wine (Mid-Range)": 1.0,
+    "Domestic Beer (0.5 liter bottle)": 1.0,
+    "Imported Beer (0.33 liter bottle)": 1.0,
+    "Cigarettes 20 Pack (Marlboro)": 1.0,
+    "One-way Ticket (Local Transport)": 1.0,
+    "Monthly Pass (Regular Price)": 1.0,
+    "Taxi Start (Normal Tariff)": 1.0,
+    "Taxi 1km (Normal Tariff)": 1.0,
+    "Taxi 1hour Waiting (Normal Tariff)": 1.0,
+    "Gasoline (1 liter)": 1.0,
+    "Volkswagen Golf 1.4 90 KW Trendline (Or Equivalent New Car)": 1.0,
+    "Toyota Corolla Sedan 1.6l 97kW Comfort (Or Equivalent New Car)": 1.0,
+    "Basic (Electricity, Heating, Cooling, Water, Garbage) for 85m2 Apartment": 1.0,
+    "1 min. of Prepaid Mobile Tariff Local (No Discounts or Plans)": 1.0,
+    "Internet (60 Mbps or More, Unlimited Data, Cable/ADSL)": 1.0,
+    "Fitness Club, Monthly Fee for 1 Adult": 1.0,
+    "Tennis Court Rent (1 Hour on Weekend)": 1.0,
+    "Cinema, International Release, 1 Seat": 1.0,
+    "Preschool (or Kindergarten), Full Day, Private, Monthly for 1 Child": 1.0,
+    "International Primary School, Yearly for 1 Child": 1.0,
+    "1 Pair of Jeans (Levis 501 Or Similar)": 1.0,
+    "1 Summer Dress in a Chain Store (Zara, H&M, ...)": 1.0,
+    "1 Pair of Nike Running Shoes (Mid-Range)": 1.0,
+    "1 Pair of Men Leather Business Shoes": 1.0,
+    "Apartment (1 bedroom) in City Centre": 1.0,
+    "Apartment (1 bedroom) Outside of Centre": 1.0,
+    "Apartment (3 bedrooms) in City Centre": 1.0,
+    "Apartment (3 bedrooms) Outside of Centre": 1.0,
+    "Price per Square Meter to Buy Apartment in City Centre": 1.0,
+    "Price per Square Meter to Buy Apartment Outside of Centre": 1.0,
+    "Average Monthly Net Salary (After Tax)": 1.0,
+}
+
+@require_GET
+def estimate_income(request, income, currency, country1, country2):
+    user = None
+
+    try:
+        pass
+        #user = verify_token(request)
+        # Rest of your code...
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=401)
+
+    
+    url1 = f"http://localhost:3000/{country1}?currency={currency}"
+    url2 = f"http://localhost:3000/{country2}?currency={currency}"
+
+    response1 = requests.get(url1).json()
+    response2 = requests.get(url2).json()
+
+    print(json.dumps(response1, indent=4))
+
+    country1_value = Decimal(0);
+    for item in response1['costs']:
+        cost = Decimal(item['cost'].replace(',', ''))
+        country1_value += cost * Decimal(weights[item['item']])
+
+    country2_value = Decimal(0);
+    for item in response2['costs']:
+        cost = Decimal(item['cost'].replace(',', ''))
+        country2_value += cost * Decimal(weights[item['item']])
+    
+
+    m = float(country1_value / country2_value) if country1_value != 0 else None
+
+    return JsonResponse({"new_income": round(income * m if m else income)});
 
 @require_GET
 def compare_countries(request, currency, country1, country2):
@@ -239,17 +332,28 @@ def get_calls_remaining(request):
 
     return JsonResponse({"calls_remaining": user_profile.calls_remaining})
 
+@require_GET
+def get_api_payments(request):
+    user = verify_token(request);
+    payments = user.api_payments.all();
 
+    response = []
 
+    for payment in payments: 
+        p = {};
+        p['qty'] = payment.qty
+        p['amount_paid'] = payment.amount_paid
+        p['date'] = payment.date
+
+        response.append(p)
+
+    return JsonResponse({"api_payments": response})
 
 @csrf_exempt
 def stripe_webhook(request):
     event = None
     payload = request.body
     sig_header = request.headers['STRIPE_SIGNATURE']
-
-    print(request.body)
-    print(request.headers)
 
     try:
         event = stripe.Webhook.construct_event(
@@ -264,11 +368,14 @@ def stripe_webhook(request):
         session = event.data.object
         checkout = stripe.checkout.Session.retrieve(session['id'], expand=["line_items"])
         user = User.objects.get(id=session['client_reference_id'])
-        print(checkout)
+
         user_profile = UserProfile.objects.get(user=user)
 
         user_profile.calls_remaining += checkout['line_items']['data'][0]["quantity"]
         user_profile.save()
+
+        api_payment = ApiPayment(user=user, amount_paid=checkout['amount_total'], qty=checkout['line_items']['data'][0]["quantity"])
+        api_payment.save()
     else:
         print('Unhandled event type {}'.format(event.type))
 

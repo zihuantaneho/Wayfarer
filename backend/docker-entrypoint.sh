@@ -1,5 +1,2 @@
 echo "Apply database migrations"
-python3 manage.py migrate
-
-echo "Starting server"
-python manage.py runserver 0.0.0.0:8000
+STRIPE_API_KEY="A" STRIPE_WEBHOOK_SECRET="B" python3 manage.py migrate

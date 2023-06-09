@@ -1,6 +1,13 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Route, Navigate, Routes } from "react-router-dom";
-import { ComparePage, SignInPage, HomePage, SignUpPage, SettingsPage } from "./pages";
+import {
+  ComparePage,
+  SignInPage,
+  HomePage,
+  SignUpPage,
+  SettingsPage,
+  Estimator,
+} from "./pages";
 
 const App = () => {
   useEffect(() => {
@@ -10,7 +17,7 @@ const App = () => {
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [])
+  }, []);
 
   return (
     <BrowserRouter>
@@ -18,6 +25,7 @@ const App = () => {
         <Route path="/" exact element={<Navigate to="/home" />} />
         <Route path="/home" exact element={<HomePage />} />
         <Route path="/compare" exact element={<ComparePage />} />
+        <Route path="/estimate" exact element={<Estimator />} />
         <Route path="/sign-up" exact element={<SignUpPage />} />
         <Route path="/sign-in" exact element={<SignInPage />} />
         <Route path="/settings" exact element={<SettingsPage />} />
