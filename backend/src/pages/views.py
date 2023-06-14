@@ -98,59 +98,59 @@ def verify_token(request):
         raise Exception('Token not provided.')
 
 weights = {
-    "Meal, Inexpensive Restaurant": 1.0,
-    "Meal for 2 People, Mid-range Restaurant, Three-course": 1.0,
-    "McMeal at McDonalds (or Equivalent Combo Meal)": 1.0,
-    "Domestic Beer (0.5 liter draught)": 1.0,
-    "Imported Beer (0.33 liter bottle)": 1.0,
-    "Cappuccino (regular)": 1.0,
-    "Coke/Pepsi (0.33 liter bottle)": 1.0,
+    "Meal, Inexpensive Restaurant": 0.9,
+    "Meal for 2 People, Mid-range Restaurant, Three-course": 0.5,
+    "McMeal at McDonalds (or Equivalent Combo Meal)": 0.7,
+    "Domestic Beer (0.5 liter draught)": 0.4,
+    "Imported Beer (0.33 liter bottle)": 0.3,
+    "Cappuccino (regular)": 0.7,
+    "Coke/Pepsi (0.33 liter bottle)": 0.9,
     "Water (0.33 liter bottle)": 1.0,
     "Milk (regular), (1 liter)": 1.0,
     "Loaf of Fresh White Bread (500g)": 1.0,
     "Rice (white), (1kg)": 1.0,
-    "Eggs (regular) (12)": 1.0,
-    "Local Cheese (1kg)": 1.0,
-    "Chicken Fillets (1kg)": 1.0,
-    "Beef Round (1kg) (or Equivalent Back Leg Red Meat)": 1.0,
+    "Eggs (regular) (12)": 0.9,
+    "Local Cheese (1kg)": 0.9,
+    "Chicken Fillets (1kg)": 0.9,
+    "Beef Round (1kg) (or Equivalent Back Leg Red Meat)": 0.8,
     "Apples (1kg)": 1.0,
     "Banana (1kg)": 1.0,
-    "Oranges (1kg)": 1.0,
-    "Tomato (1kg)": 1.0,
-    "Potato (1kg)": 1.0,
-    "Onion (1kg)": 1.0,
-    "Lettuce (1 head)": 1.0,
-    "Water (1.5 liter bottle)": 1.0,
-    "Bottle of Wine (Mid-Range)": 1.0,
-    "Domestic Beer (0.5 liter bottle)": 1.0,
-    "Imported Beer (0.33 liter bottle)": 1.0,
-    "Cigarettes 20 Pack (Marlboro)": 1.0,
+    "Oranges (1kg)": 0.6,
+    "Tomato (1kg)": 0.7,
+    "Potato (1kg)": 0.5,
+    "Onion (1kg)": 0.4,
+    "Lettuce (1 head)": 0.2,
+    "Water (1.5 liter bottle)": 0.9,
+    "Bottle of Wine (Mid-Range)": 0.5,
+    "Domestic Beer (0.5 liter bottle)": 0.2,
+    "Imported Beer (0.33 liter bottle)": 0.1,
+    "Cigarettes 20 Pack (Marlboro)": 0.3,
     "One-way Ticket (Local Transport)": 1.0,
-    "Monthly Pass (Regular Price)": 1.0,
-    "Taxi Start (Normal Tariff)": 1.0,
-    "Taxi 1km (Normal Tariff)": 1.0,
-    "Taxi 1hour Waiting (Normal Tariff)": 1.0,
+    "Monthly Pass (Regular Price)": 0.8,
+    "Taxi Start (Normal Tariff)": 0.6,
+    "Taxi 1km (Normal Tariff)": 0.6,
+    "Taxi 1hour Waiting (Normal Tariff)": 0.4,
     "Gasoline (1 liter)": 1.0,
-    "Volkswagen Golf 1.4 90 KW Trendline (Or Equivalent New Car)": 1.0,
-    "Toyota Corolla Sedan 1.6l 97kW Comfort (Or Equivalent New Car)": 1.0,
+    "Volkswagen Golf 1.4 90 KW Trendline (Or Equivalent New Car)": 0.7,
+    "Toyota Corolla Sedan 1.6l 97kW Comfort (Or Equivalent New Car)": 0.4,
     "Basic (Electricity, Heating, Cooling, Water, Garbage) for 85m2 Apartment": 1.0,
     "1 min. of Prepaid Mobile Tariff Local (No Discounts or Plans)": 1.0,
     "Internet (60 Mbps or More, Unlimited Data, Cable/ADSL)": 1.0,
-    "Fitness Club, Monthly Fee for 1 Adult": 1.0,
-    "Tennis Court Rent (1 Hour on Weekend)": 1.0,
-    "Cinema, International Release, 1 Seat": 1.0,
-    "Preschool (or Kindergarten), Full Day, Private, Monthly for 1 Child": 1.0,
-    "International Primary School, Yearly for 1 Child": 1.0,
-    "1 Pair of Jeans (Levis 501 Or Similar)": 1.0,
-    "1 Summer Dress in a Chain Store (Zara, H&M, ...)": 1.0,
-    "1 Pair of Nike Running Shoes (Mid-Range)": 1.0,
-    "1 Pair of Men Leather Business Shoes": 1.0,
-    "Apartment (1 bedroom) in City Centre": 1.0,
-    "Apartment (1 bedroom) Outside of Centre": 1.0,
-    "Apartment (3 bedrooms) in City Centre": 1.0,
-    "Apartment (3 bedrooms) Outside of Centre": 1.0,
-    "Price per Square Meter to Buy Apartment in City Centre": 1.0,
-    "Price per Square Meter to Buy Apartment Outside of Centre": 1.0,
+    "Fitness Club, Monthly Fee for 1 Adult": 0.4,
+    "Tennis Court Rent (1 Hour on Weekend)": 0.2,
+    "Cinema, International Release, 1 Seat": 0.7,
+    "Preschool (or Kindergarten), Full Day, Private, Monthly for 1 Child": 0.3,
+    "International Primary School, Yearly for 1 Child": 0.6,
+    "1 Pair of Jeans (Levis 501 Or Similar)": 0.8,
+    "1 Summer Dress in a Chain Store (Zara, H&M, ...)": 0.4,
+    "1 Pair of Nike Running Shoes (Mid-Range)": 0.5,
+    "1 Pair of Men Leather Business Shoes": 0.5,
+    "Apartment (1 bedroom) in City Centre": 0.8,
+    "Apartment (1 bedroom) Outside of Centre": 0.6,
+    "Apartment (3 bedrooms) in City Centre": 0.5,
+    "Apartment (3 bedrooms) Outside of Centre": 0.4,
+    "Price per Square Meter to Buy Apartment in City Centre": 0.5,
+    "Price per Square Meter to Buy Apartment Outside of Centre": 0.5,
     "Average Monthly Net Salary (After Tax)": 1.0,
 }
 
@@ -165,7 +165,7 @@ def estimate_income(request, income, currency, country1, country2):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=401)
 
-    
+
     url1 = f"http://localhost:3000/{country1}?currency={currency}"
     url2 = f"http://localhost:3000/{country2}?currency={currency}"
 
@@ -177,15 +177,17 @@ def estimate_income(request, income, currency, country1, country2):
     country1_value = Decimal(0);
     for item in response1['costs']:
         cost = Decimal(item['cost'].replace(',', ''))
-        country1_value += cost * Decimal(weights[item['item']])
+        w = weights.get(item['item'], None)
+        country1_value += cost * Decimal(w or 0)
 
     country2_value = Decimal(0);
     for item in response2['costs']:
         cost = Decimal(item['cost'].replace(',', ''))
-        country2_value += cost * Decimal(weights[item['item']])
-    
+        w = weights.get(item['item'], None)
+        country2_value += cost * Decimal(w or 0)
 
-    m = float(country1_value / country2_value) if country1_value != 0 else None
+
+    m = float(country1_value / country2_value) if country2_value != 0 else None
 
     return JsonResponse({"new_income": round(income * m if m else income)});
 
@@ -339,7 +341,7 @@ def get_api_payments(request):
 
     response = []
 
-    for payment in payments: 
+    for payment in payments:
         p = {};
         p['qty'] = payment.qty
         p['amount_paid'] = payment.amount_paid

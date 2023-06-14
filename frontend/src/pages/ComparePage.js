@@ -57,17 +57,18 @@ export const ComparePage = () => {
     } catch (error) {
       setComparisonData(null);
       setError(error.response.data.error);
-      // Обработка ошибки, если запрос не удался
+
     }
   };
 
   const onSavePDF = () => {
     html2canvas(document.getElementById("content")).then(function (canvas) {
-      document.body.appendChild(canvas);
-      var imgdata = canvas.toDataURL("image/jpg");
-      var doc = new jspdf.jsPDF();
-      doc.addImage(imgdata, "JPG", 0, 0, 272, 352);
-      doc.save("sample.pdf");
+      var imgData = canvas.toDataURL("image/jpeg", 1.0);
+      var pdf = new jspdf.jsPDF();
+      var width = pdf.internal.pageSize.getWidth();
+      var height = pdf.internal.pageSize.getHeight();
+      pdf.addImage(imgData, "JPEG", 0, 0, width, height, "", "FAST");
+      pdf.save("compare.pdf");
     });
   };
 
@@ -157,8 +158,9 @@ export const ComparePage = () => {
         Compare Countries
       </h1>
       <p className="mb-4 dark:text-white">
-        Using this tool you compare the population of the two countries
-        supported by our dataset.
+      The Compare tool enables you to easily analyze and contrast the expenses of living and related indicators between two different countries.
+      By choosing the two countries you're interested in, you'll obtain valuable information about the comparative cost of living and other relevant factors.
+      Whether you're contemplating a move or organizing a vacation, this tool assists you in assessing and comparing the cost of living between different nations.
       </p>
       <form
         id="country-form"

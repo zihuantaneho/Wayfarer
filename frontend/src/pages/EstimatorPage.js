@@ -155,7 +155,7 @@ export const Estimator = () => {
 
         <button
           onClick={handleSubmit}
-          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+          className="bg-yellow-400 hover:bg-yellow-600 text-white py-2 px-4 rounded"
         >
           {isLoading ? "Loading..." : "Calculate"}
         </button>
