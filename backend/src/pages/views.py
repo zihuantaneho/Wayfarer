@@ -329,16 +329,20 @@ def stripe_checkout(request, qty):
 
 @require_GET
 def get_calls_remaining(request):
-    user = verify_token(request);
-    user_profile = UserProfile.objects.get(user=user);
-
+    try:
+        user = verify_token(request);
+        user_profile = UserProfile.objects.get(user=user);
+    except:
+        return JsonResponse({"calls_remaining": 0})
     return JsonResponse({"calls_remaining": user_profile.calls_remaining})
 
 @require_GET
 def get_api_payments(request):
-    user = verify_token(request);
-    payments = user.api_payments.all();
-
+    try:
+        user = verify_token(request);
+        payments = user.api_payments.all();
+    except:
+        return JsonResponse({"api_payments": []})
     response = []
 
     for payment in payments:
