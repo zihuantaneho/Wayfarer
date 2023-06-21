@@ -73,7 +73,7 @@ export const Estimator = () => {
           <div className="self-baseline">
             <button
               onClick={onBack}
-              className="self-baseline bg-gray-200 dark:bg-gray-700 hover:bg-yellow-600 dark:md:hover:bg-gray-400 text-black dark:text-white font-semibold py-2 px-4 rounded w-full"
+              className="self-baseline bg-gray-3  00 dark:bg-gray-600 hover:bg-yellow-600 dark:md:hover:bg-gray-400 text-black dark:text-white font-semibold py-2 px-4 rounded w-full"
             >
               Go Back
             </button>
@@ -97,7 +97,7 @@ export const Estimator = () => {
         <label className="block mb-4 text-black dark:text-white">
           Currency:
           <select
-            value={currentIncome}
+            value={currency}
             onChange={handleCurrencyChange}
             className="block w-full rounded border-gray-700 bg-gray-100 dark:bg-gray-900 border p-2 mt-1"
           >

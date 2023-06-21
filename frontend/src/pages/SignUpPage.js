@@ -50,7 +50,7 @@ export const SignUpPage = () => {
       />
       <button
         onClick={handleSignUp}
-        className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded dark:bg-yellow-600 dark:hover:bg-yellow-700"
+        className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded dark:bg-yellow-600 dark:hover:bg-yellow-700"
       >
         Sign Up
       </button>

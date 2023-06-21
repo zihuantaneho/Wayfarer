@@ -16,7 +16,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/:country', async (req, res) => {
-  const country = _.words(_.startCase(req.params.country)).join('-');
+  const country = _.words(_.startCase(req.params.country)).join('+');
   const { currency = 'CAD' } = req.query;
 
   const response = await fetch(
